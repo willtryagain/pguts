@@ -1,0 +1,35 @@
+name: spin_env # Or spin_env, as you prefer. The environment will be created with this name.
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  # Python version
+  - python=3.8
+
+  # Core PyTorch stack
+  - pytorch==2.3.0
+  - torchvision==0.18.0
+  - torchaudio==2.3.0
+  - pytorch-cuda=11.8
+
+  # Other conda/micromamba installed packages
+  - numpy
+  - pandas=1.4.4
+
+  # Pip for remaining packages
+  - pip
+  - pip:
+    # We will install PyTorch Geometric and its dependencies manually later.
+    # tensorboard==2 interpreted as a version from the 2.x series.
+    # pytorch-lightning 1.5 requires tensorboard>=2.2.0.
+    - tensorboard>=2.2.0,<2.17.0 # e.g., latest 2.x version like 2.16.2
+    - pytorch-lightning==1.5.1
+
+    # WARNING: TorchMetrics 0.7.0 is from early 2022 and might also be
+    # incompatible with PyTorch 2.3.0. It was aligned with PyTorch Lightning 1.5.x.
+    - torchmetrics==0.7.0
+
+    - wandb
+    - torch_spatiotemporal==0.1.1 # Check compatibility with PyTorch 2.3.0
