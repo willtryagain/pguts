@@ -1,7 +1,7 @@
 import copy
 import datetime
 import os
-from code.imputers import SPINImputer
+from code.imputers import FCSPINImputer, SPINImputer
 from code.models import PGUTS
 from code.scheduler import CosineScheduler, CosineSchedulerWithRestarts
 
@@ -27,9 +27,11 @@ import wandb
 print(os.getcwd())
 
 
-def get_model_classes(model_str):
-    if model_str == "PGUTS":
+def get_model_classes(model_str, forecast=None):
+    if model_str == "PGUTS" and not forecast:
         model, filler = PGUTS, SPINImputer
+    elif model_str == "PGUTS" and forecast:
+        model, filler = PGUTS, FCSPINImputer
     else:
         raise ValueError(f"Model {model_str} not available.")
     return model, filler
@@ -45,6 +47,9 @@ def get_dataset(dataset_name: str):
     elif dataset_name.endswith("_block"):
         p_fault, p_noise = 0.0015, 0.05
         dataset_name = dataset_name[:-6]
+    elif dataset_name.endswith("_fc"):
+        p_fault, p_noise = 0.00, 0.0
+        dataset_name = dataset_name[:-3]
     else:
         raise ValueError(f"Invalid dataset name: {dataset_name}.")
     if dataset_name == "la":
@@ -114,6 +119,7 @@ def parse_args():
     parser.add_argument("--grad-clip-val", type=float, default=5.0)
     parser.add_argument("--loss-fn", type=str, default="l1_loss")
     parser.add_argument("--lr-scheduler", type=str, default=None)
+
     # Connectivity params
     parser.add_argument("--adj-threshold", type=float, default=0.1)
 
@@ -163,7 +169,9 @@ def run_experiment(args):
         "spin_h",
     ]
 
-    model_cls, imputer_class = get_model_classes(args.model_name)
+    model_cls, imputer_class = get_model_classes(
+        args.model_name, "fc" in args.dataset_name
+    )
     dataset = get_dataset(args.dataset_name)
     if args.dataset_name.startswith("air36"):
         args.window = 36

@@ -1,0 +1,15 @@
+#########################      INFERENCE CONFIG      ##########################
+
+#### Experiment params ########################################################
+
+dataset_name: "air36" #[la_point, bay_point, la_bock, bay_bock, air, air36]
+model_name: "PGUTS"
+exp_name: '20250516T091721_170851296' #{exp_name}
+
+#### Data params ##############################################################
+p_fault: 0.05 # [0.05, 0.1, 0.15]
+p_noise: 0
+test_mask_seed: [6043, 2043, 3043, 4043, 5043]
+
+#### Windowing params #########################################################
+batch_size: 1
